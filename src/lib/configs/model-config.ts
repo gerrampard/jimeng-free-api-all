@@ -39,6 +39,27 @@ export interface ModelConfig {
 
 // 模型配置映射
 export const MODEL_CONFIGS: Record<string, ModelConfig> = {
+  "jimeng-video-3.5-pro": {
+    internalModel: "dreamina_ic_generate_video_model_vgfm_3.5_pro",
+    draftVersion: "3.3.4",
+    features: {
+      multiImage: false,
+      imageToImage: true,
+      videoGeneration: true,
+    },
+    defaultParams: {
+      width: 1280,
+      height: 720,
+      resolutions: [
+        { width: 1280, height: 720 },
+        { width: 720, height: 1280 },
+        { width: 1080, height: 1080 },
+        { width: 1920, height: 1080 },
+        { width: 1080, height: 1920 },
+      ],
+      sampleStrengthRange: [0.1, 1.0],
+    },
+  },
   "jimeng-4.5": {
     internalModel: "high_aes_general_v40l",
     draftVersion: "3.3.4",

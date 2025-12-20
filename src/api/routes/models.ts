@@ -74,6 +74,12 @@ export default {
                         "description": "即梦AI图像生成模型 XL Pro 版本"
                     },
                     {
+                        "id": "jimeng-video-3.5-pro",
+                        "object": "model",
+                        "owned_by": "jimeng-free-api",
+                        "description": "即梦AI视频生成模型 3.5 专业版"
+                    },
+                    {
                         "id": "jimeng-video-3.0",
                         "object": "model",
                         "owned_by": "jimeng-free-api",

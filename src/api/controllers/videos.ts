@@ -10,8 +10,18 @@ import logger from "@/lib/logger.ts";
 
 const DEFAULT_ASSISTANT_ID = 513695;
 export const DEFAULT_MODEL = "jimeng-video-3.0";
-const DRAFT_VERSION = "3.2.8";
+const DEFAULT_DRAFT_VERSION = "3.2.8";
+
+const MODEL_DRAFT_VERSIONS: { [key: string]: string } = {
+  "jimeng-video-3.5-pro": "3.3.4",
+  "jimeng-video-3.0-pro": "3.2.8",
+  "jimeng-video-3.0": "3.2.8",
+  "jimeng-video-2.0": "3.2.8",
+  "jimeng-video-2.0-pro": "3.2.8"
+};
+
 const MODEL_MAP = {
+  "jimeng-video-3.5-pro": "dreamina_ic_generate_video_model_vgfm_3.5_pro",
   "jimeng-video-3.0-pro": "dreamina_ic_generate_video_model_vgfm_3.0_pro",
   "jimeng-video-3.0": "dreamina_ic_generate_video_model_vgfm_3.0",
   "jimeng-video-2.0": "dreamina_ic_generate_video_model_vgfm_lite",
@@ -771,6 +781,9 @@ export async function generateVideo(
     "originSubmitId": util.uuid(),
   });
   
+  // 获取当前模型的 draft 版本
+  const draftVersion = MODEL_DRAFT_VERSIONS[_model] || DEFAULT_DRAFT_VERSION;
+  
   // 计算视频宽高比
   const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
   const divisor = gcd(width, height);
@@ -785,7 +798,7 @@ export async function generateVideo(
       params: {
         aigc_features: "app_lip_sync",
         web_version: "6.6.0",
-        da_version: DRAFT_VERSION,
+        da_version: draftVersion,
       },
       data: {
         "extend": {
@@ -810,7 +823,7 @@ export async function generateVideo(
           "id": util.uuid(),
           "min_version": "3.0.5",
           "is_from_tsn": true,
-          "version": DRAFT_VERSION,
+          "version": draftVersion,
           "main_component_id": componentId,
           "component_list": [{
             "type": "video_base_component",

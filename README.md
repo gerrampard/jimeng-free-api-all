@@ -7,7 +7,12 @@
 
 ## 更新日志
 
-### 2024-12-12 v4.7 更新 - 参数格式优化
+### 2024-12-20 v0.6 更新 - 新增视频模型
+- **新增 jimeng-video-3.5-pro 模型**：最新视频生成模型，使用 `dreamina_ic_generate_video_model_vgfm_3.5_pro` 内部模型
+- **升级 Draft 版本**：jimeng-video-3.5-pro 使用 `3.3.4` 版本
+- **动态版本管理**：根据不同视频模型自动选择对应的 draft 版本
+
+### 2024-12-12 v0.5 更新 - 参数格式优化
 - **统一参数格式**：使用 `ratio`（比例）和 `resolution`（分辨率）替代 `width`/`height` 参数
 - **图片接口参数变更**：
   - 移除 `width`、`height`、`size` 参数支持
@@ -21,7 +26,7 @@
 - **支持 multipart/form-data**：图生图和视频生成支持直接上传文件
 - **优化错误提示**：使用不支持的参数时提供清晰的错误信息
 
-### 2024-12-11 v4.6 更新 - 免积分优化
+### 2024-12-11 v0.4 更新 - 免积分优化
 - **修复积分扣费问题**：优化请求参数，实现文生图、图生图功能不再扣除积分
 - **核心修复内容**：
   - 添加关键请求参数：`da_version`、`web_component_open_flag`、`web_version`、`aigc_features`
@@ -32,7 +37,7 @@
 - **更新浏览器指纹**：Chrome 版本从 131 更新到 142
 - **移除冗余 Header**：移除 `Last-event-id` 字段
 
-### 2024-12-08 v4.5 更新
+### 2024-12-08 v0.3 更新
 - **修复 jimeng-4.5 模型**：修复模型映射名称错误（`high_aes_general_v45` → `high_aes_general_v40l`）
 - **更新 API 协议**：同步最新即梦 API 协议，更新 `draft_content` 和 `metrics_extra` 结构
 - **升级版本号**：`DRAFT_VERSION` 升级到 `3.3.4`
@@ -85,7 +90,9 @@
 
 ![img](https://mypicture-1258720957.cos.ap-nanjing.myqcloud.com/Obsidian/QQ_1757688755495.png)
 
+文生视频3.5 （支持视频+声音）
 
+![image-20251220192531051](https://mypicture-1258720957.cos.ap-nanjing.myqcloud.com/Obsidian/image-20251220192531051.png)
 
 ## Docker 部署
 
@@ -131,13 +138,14 @@ docker run -it -d --init --name jimeng-free-api-all -p 8001:8000 -e TZ=Asia/Shan
 
 目前支持与 openai 兼容的 `/v1/chat/completions` 接口，可自行使用与 openai 或其他兼容的客户端接入接口，模型名称包括：
 - **文生图模型**：`jimeng-4.5`（推荐）、`jimeng-4.1`、`jimeng-4.0`、`jimeng-3.1`、`jimeng-3.0`、`jimeng-2.1`、`jimeng-2.0-pro`、`jimeng-2.0`、`jimeng-1.4`、`jimeng-xl-pro`
-- **视频生成模型**：`jimeng-video-3.0`、`jimeng-video-3.0-pro`、`jimeng-video-2.0`、`jimeng-video-2.0-pro`
+- **视频生成模型**：`jimeng-video-3.5-pro`（最新）、`jimeng-video-3.0`、`jimeng-video-3.0-pro`、`jimeng-video-2.0`、`jimeng-video-2.0-pro`
 
 ### 模型映射表
 
 | 用户模型名 | 内部模型名 | 说明 |
 |-----------|-----------|------|
 | `jimeng-4.5` | `high_aes_general_v40l` | 最新模型，推荐使用 |
+| `jimeng-video-3.5-pro` | `dreamina_ic_generate_video_model_vgfm_3.5_pro` | 最新视频模型 |
 | `jimeng-4.1` | `high_aes_general_v41` | 高质量模型 |
 | `jimeng-4.0` | `high_aes_general_v40` | 稳定版本 |
 | `jimeng-3.1` | `high_aes_general_v30l_art_fangzhou` | 艺术风格 |
@@ -172,11 +180,10 @@ Authorization: Bearer [sessionid]
 
 ```json
 {
-  "model": "jimeng-video-3.0",
-  "prompt": "视频描述文本",
-  "ratio": "16:9",
+  "model": "jimeng-video-3.5-pro",
+  "prompt": "人物慢向前移动,还唱着歌",
+  "ratio": "4:3",
   "resolution": "720p",
-  "duration": 5,
   "file_paths": ["首帧图片URL", "尾帧图片URL"]
 }
 ```
@@ -211,7 +218,7 @@ Authorization: Bearer [sessionid]
   }]
 }
 ```
-其他模型可另选jimeng-video-3.0/jimeng-video-3.0-pro/jimeng-video-2.0/jimeng-video-2.0-pro
+可用视频模型：`jimeng-video-3.5-pro`（推荐）、`jimeng-video-3.0`、`jimeng-video-3.0-pro`、`jimeng-video-2.0`、`jimeng-video-2.0-pro`
 
 
 ### 图像生成
