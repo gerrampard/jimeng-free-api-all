@@ -492,9 +492,9 @@ python3 scripts/logout-sessions.py 73795a52a17c7ee7e95c213a22135c96
 
 # 批量退出多个 sessionid（空格分隔）
 python3 scripts/logout-sessions.py \
-  73795a52a17c7ee7e95c213a22135c96 \
-  284a87a1fb9b589bf7927a9b2cd50321 \
-  0b6873d7aa4f947b144dd55be06359ec
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
+  cccccccccccccccccccccccccccccccc
 ```
 
 **方式二：编辑脚本列表**
@@ -503,9 +503,9 @@ python3 scripts/logout-sessions.py \
 
 ```python
 SESSION_IDS = [
-    "73795a52a17c7ee7e95c213a22135c96",
-    "284a87a1fb9b589bf7927a9b2cd50321",
-    "0b6873d7aa4f947b144dd55be06359ec",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "cccccccccccccccccccccccccccccccc",
 ]
 ```
 
@@ -522,21 +522,21 @@ python3 scripts/logout-sessions.py
 ============================================================
 共 3 个 sessionid 待处理
 
-[1/3] 处理: 73795a52a17c7ee7e95c213a22135c96
+[1/3] 处理: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
          → ✅  退出成功（服务器端已失效）
 
-[2/3] 处理: 284a87a1fb9b589bf7927a9b2cd50321
+[2/3] 处理: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
          → ✅  退出成功（服务器端已失效）
 
-[3/3] 处理: caae6be8420d0cee663c2d93a562cbff
+[3/3] 处理: cccccccccccccccccccccccccccccccc
          → ⬜  已失效，无需处理
 
 ============================================================
 退出结果汇总：
 ============================================================
-  73795a52a17c7ee7e95c213a22135c96  →  ✅  退出成功（服务器端已失效）
-  284a87a1fb9b589bf7927a9b2cd50321  →  ✅  退出成功（服务器端已失效）
-  caae6be8420d0cee663c2d93a562cbff  →  ⬜  已失效，无需处理（无需处理）
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  →  ✅  退出成功（服务器端已失效）
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  →  ✅  退出成功（服务器端已失效）
+  cccccccccccccccccccccccccccccccc  →  ⬜  已失效，无需处理（无需处理）
 
   ✅ 成功退出：2 个
   ⬜ 已失效：  1 个（无需处理）
