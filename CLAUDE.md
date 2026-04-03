@@ -6,7 +6,7 @@
 
 即梦 AI 免费 API 服务 - 逆向工程的 API 服务器，提供 OpenAI 兼容接口，封装即梦 AI 的图像和视频生成能力。
 
-**版本：** v0.8.9
+**版本：** v0.8.10
 
 **核心功能：**
 - 文生图：支持 jimeng-5.0、jimeng-4.6、jimeng-4.5 等多款模型，最高 4K 分辨率
@@ -108,7 +108,7 @@ src/
 | `/v1/chat/completions` | POST | OpenAI 兼容的对话接口（用于图像/视频生成） |
 | `/v1/images/generations` | POST | 文生图/图生图接口（支持 images 可选参数） |
 | `/v1/images/compositions` | POST | 图生图接口（支持文件上传，向后兼容） |
-| `/v1/videos/generations` | POST | 视频生成接口（含 Seedance 2.0 / 2.0-fast） |
+| `/v1/videos/generations` | POST | 视频生成接口（含 Seedance 2.0 / 2.0-fast / 2.0-fast-vip / 2.0-vip） |
 | `/v1/videos/international/generations` | POST | 国际版 Seedance 视频生成（同步） |
 | `/v1/videos/international/generations/async` | POST | 国际版 Seedance 异步视频生成（提交任务） |
 | `/v1/videos/international/generations/async/:taskId` | GET | 国际版 Seedance 异步视频生成（查询结果） |
@@ -158,6 +158,10 @@ src/
 | `seedance-2.0-pro` | `dreamina_seedance_40_pro` | 多图智能视频生成专业版（向后兼容别名） |
 | `jimeng-video-seedance-2.0-fast` | `dreamina_seedance_40` | Seedance 2.0-fast 快速版（上游标准名称） |
 | `seedance-2.0-fast` | `dreamina_seedance_40` | Seedance 2.0-fast 快速版（向后兼容别名） |
+| `jimeng-video-seedance-2.0-fast-vip` | `dreamina_seedance_40_vision` | Seedance 2.0 Fast VIP Vision 极速推理版（会员专属通道） |
+| `seedance-2.0-fast-vip` | `dreamina_seedance_40_vision` | Seedance 2.0 Fast VIP Vision（向后兼容别名） |
+| `jimeng-video-seedance-2.0-vip` | `dreamina_seedance_40_pro_vision` | Seedance 2.0 VIP Vision 主模态能力版（会员专属通道） |
+| `seedance-2.0-vip` | `dreamina_seedance_40_pro_vision` | Seedance 2.0 VIP Vision（向后兼容别名） |
 
 ### 请求参数
 
@@ -203,7 +207,10 @@ src/
 - 快速版模型名：`jimeng-video-seedance-2.0-fast`（兼容 `seedance-2.0-fast`）
 - 内部模型（标准版）：`dreamina_seedance_40_pro`，benefit_type：`dreamina_video_seedance_20_pro`
 - 内部模型（快速版）：`dreamina_seedance_40`，benefit_type：`dreamina_seedance_20_fast`（注意：无 `video_` 前缀）
-- Draft 版本：3.3.9
+- VIP 模型（Fast VIP Vision 极速推理）：`dreamina_seedance_40_vision`，benefit_type：`seedance_20_fast_720p_output`（会员专属通道）
+- VIP 模型（VIP Vision 主模态能力）：`dreamina_seedance_40_pro_vision`，benefit_type：`seedance_20_pro_720p_output`（会员专属通道）
+- Draft 版本：3.3.9（普通版）/ 3.3.12（VIP 版）
+- 生成请求新增参数：`commerce_with_input_video: "1"`、`workspace_id: 0`（v0.8.10）
 - 时长范围：4-15 秒（连续范围，与上游 iptag/jimeng-api 一致）
 - 提示词占位符：`@1`、`@2`、`@图1`、`@图2`、`@image1`、`@image2` 引用上传的素材
 - 支持的素材格式：图片（jpg/png/webp/gif/bmp）、视频（mp4/mov/m4v）、音频（mp3/wav）
@@ -238,6 +245,7 @@ src/
 - **VOD 通道**（视频/音频上传）：`get_upload_token(scene=1)` → `vod.bytedanceapi.com` → `ApplyUploadInner` / `CommitUploadInner`，返回 vid 格式 `v028xxx`，SpaceName 为 `dreamina`
 - AWS Signature V4 签名：ImageX 使用 service=`imagex`，VOD 使用 service=`vod`，region 均为 `cn-north-1`
 - VOD 上传自动返回媒体元数据（Duration、Width、Height、Fps 等），音频时长 fallback 使用本地 WAV 头解析
+- **区域感知上传路由**（v0.8.10）：`regionFetch()` 自动判断 `regionInfo.isInternational`，国际版走 `proxyFetch`（代理），国内版走 `cnFetch`（直连），避免 CN 上传目标走代理失败
 
 ### 分辨率支持
 
@@ -330,6 +338,25 @@ curl -X POST http://localhost:8000/v1/videos/generations \
   -F "files=@/path/to/image.png" \
   -F "files=@/path/to/audio.wav"
 
+# Seedance 2.0 Fast VIP（会员专属极速推理通道）
+curl -X POST http://localhost:8000/v1/videos/generations \
+  -H "Authorization: Bearer your_sessionid" \
+  -F "model=jimeng-video-seedance-2.0-fast-vip" \
+  -F "prompt=@1 图片中的人物开始微笑" \
+  -F "ratio=4:3" \
+  -F "duration=4" \
+  -F "files=@/path/to/image.jpg"
+
+# Seedance 2.0 VIP（会员专属主模态能力通道）
+curl -X POST http://localhost:8000/v1/videos/generations \
+  -H "Authorization: Bearer your_sessionid" \
+  -F "model=jimeng-video-seedance-2.0-vip" \
+  -F "prompt=@1 和 @2 两人开始跳舞" \
+  -F "ratio=4:3" \
+  -F "duration=5" \
+  -F "files=@/path/to/image1.jpg" \
+  -F "files=@/path/to/image2.jpg"
+
 # 国际版 Seedance 同步生成
 curl -X POST http://localhost:8000/v1/videos/international/generations \
   -H "Authorization: Bearer sg-your_sessionid" \
@@ -396,3 +423,7 @@ curl -X POST http://localhost:8000/token/check \
 | `seedance-2.0-pro` | `dreamina_seedance_40_pro` | `seedance_20_pro_720p_output` |
 | `jimeng-video-seedance-2.0-fast` | `dreamina_seedance_40` | `seedance_20_fast_720p_output` |
 | `jimeng-video-seedance-2.0` | `dreamina_seedance_40_pro` | `seedance_20_pro_720p_output` |
+| `seedance-2.0-fast-vip` | `dreamina_seedance_40_vision` | `seedance_20_fast_720p_output` |
+| `jimeng-video-seedance-2.0-fast-vip` | `dreamina_seedance_40_vision` | `seedance_20_fast_720p_output` |
+| `seedance-2.0-vip` | `dreamina_seedance_40_pro_vision` | `seedance_20_pro_720p_output` |
+| `jimeng-video-seedance-2.0-vip` | `dreamina_seedance_40_pro_vision` | `seedance_20_pro_720p_output` |

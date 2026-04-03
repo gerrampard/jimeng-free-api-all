@@ -3,7 +3,7 @@
 即梦 AI 免费 API 服务 - 支持文生图、图生图、视频生成的 OpenAI 兼容接口
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-v0.8.9-green.svg)
+![Version](https://img.shields.io/badge/version-v0.8.10-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)
 ![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 
@@ -13,15 +13,15 @@
 
 ### 项目概述
 
-Jimeng AI Free API 是一个逆向工程的 API 服务器，将即梦 AI（Jimeng AI）的图像和视频生成能力封装为 OpenAI 兼容的 API 接口。支持最新的 **jimeng-5.0**、**jimeng-4.6** 文生图模型、**Seedance 2.0 多模态智能视频生成**（模型名 `jimeng-video-seedance-2.0`，支持图片/视频/音频混合上传）及 **Seedance 2.0-fast 快速版**（模型名 `jimeng-video-seedance-2.0-fast`），零配置部署，多路 token 支持。
+Jimeng AI Free API 是一个逆向工程的 API 服务器，将即梦 AI（Jimeng AI）的图像和视频生成能力封装为 OpenAI 兼容的 API 接口。支持最新的 **jimeng-5.0**、**jimeng-4.6** 文生图模型、**Seedance 2.0 多模态智能视频生成**（模型名 `jimeng-video-seedance-2.0`，支持图片/视频/音频混合上传）及 **Seedance 2.0-fast 快速版**（模型名 `jimeng-video-seedance-2.0-fast`），**Seedance 2.0 Fast VIP Vision**（极速推理，会员专属通道）和 **Seedance 2.0 VIP Vision**（主模态能力，会员专属通道），零配置部署，多路 token 支持。
 
 ### 核心功能
 
 - 🖼️ **文生图**：支持 jimeng-5.0、jimeng-4.6、jimeng-4.5 等多款模型，最高 4K 分辨率
 - 🎭 **图生图**：多图合成，支持 1-10 张输入图片
 - 🎬 **视频生成**：jimeng-video-3.5-pro 等模型，支持首帧/尾帧控制
-- 🌊 **Seedance 2.0 / 2.0-fast**：多模态智能视频生成，支持图片/视频/音频混合上传，@1、@2 占位符引用素材，fast 版本生成更快
-- 🌍 **国际版 Seedance**：支持国际区域 Token（sg-/it-/jp-/hk- 等前缀），纯算法签名绕过 shark 反爬，支持同步和异步两种模式
+- 🌊 **Seedance 2.0 / 2.0-fast / 2.0-fast-vip / 2.0-vip**：多模态智能视频生成，支持图片/视频/音频混合上传，@1、@2 占位符引用素材，fast 版本生成更快，VIP 版本为会员专属通道
+- 🌍 **国际版 Seedance**：支持国际区域 Token（sg-/it-/jp-/hk- 等前缀），纯算法签名绕过 shark 反爬，支持同步和异步两种模式，VIP 模型同样支持
 - 🔗 **OpenAI 兼容**：完全兼容 OpenAI API 格式，无缝对接现有客户端
 - 🔄 **多账号支持**：支持多个 sessionid 轮询使用
 
@@ -45,10 +45,12 @@ Jimeng AI Free API 是一个逆向工程的 API 服务器，将即梦 AI（Jimen
 | 图生视频 | 使用首帧/尾帧图片生成视频 | jimeng-video-3.0 等 | ✅ 可用 |
 | 多图智能视频 | Seedance 2.0 多模态混合生成 | jimeng-video-seedance-2.0, seedance-2.0 | ✅ 可用 |
 | 多图快速视频 | Seedance 2.0-fast 快速生成 | jimeng-video-seedance-2.0-fast, seedance-2.0-fast | ✅ 可用 |
+| VIP 极速视频 | Seedance 2.0 Fast VIP Vision 极速推理 | jimeng-video-seedance-2.0-fast-vip, seedance-2.0-fast-vip | ✅ 可用 |
+| VIP 专业视频 | Seedance 2.0 VIP Vision 主模态能力 | jimeng-video-seedance-2.0-vip, seedance-2.0-vip | ✅ 可用 |
 | 音频驱动视频 | Seedance 图片+音频混合生成 | jimeng-video-seedance-2.0, seedance-2.0-fast | ✅ 可用 |
 | 异步视频生成 | 提交任务立即返回，查询接口阻塞等待结果 | 所有视频模型 | ✅ 可用 |
-| 国际版 Seedance | 国际区域 Token 纯算法签名绕过 shark | seedance-2.0-fast, seedance-2.0-pro | ✅ 可用 |
-| 国际版异步视频 | 国际版 Seedance 异步生成 | seedance-2.0-fast, seedance-2.0-pro | ✅ 可用 |
+| 国际版 Seedance | 国际区域 Token 纯算法签名绕过 shark | seedance-2.0-fast, seedance-2.0-pro, seedance-2.0-fast-vip, seedance-2.0-vip | ✅ 可用 |
+| 国际版异步视频 | 国际版 Seedance 异步生成 | seedance-2.0-fast, seedance-2.0-pro, seedance-2.0-fast-vip, seedance-2.0-vip | ✅ 可用 |
 | Chat 接口 | OpenAI 兼容的对话接口 | 所有模型 | ✅ 可用 |
 
 ## 免责声明
@@ -154,7 +156,7 @@ Authorization: Bearer sessionid1,sessionid2,sessionid3
 | `/v1/chat/completions` | POST | OpenAI 兼容的对话接口 |
 | `/v1/images/generations` | POST | 文生图/图生图接口（支持 images 可选参数） |
 | `/v1/images/compositions` | POST | 图生图接口（向后兼容） |
-| `/v1/videos/generations` | POST | 视频生成接口（同步，阻塞等待结果） |
+| `/v1/videos/generations` | POST | 视频生成接口（同步，阻塞等待结果，含 VIP 模型） |
 | `/v1/videos/generations/async` | POST | 异步视频生成接口（提交任务，立即返回 task_id） |
 | `/v1/videos/generations/async/:taskId` | GET | 异步视频生成接口（查询任务结果，阻塞等待） |
 | `/v1/videos/international/generations` | POST | 国际版 Seedance 视频生成（同步） |
@@ -250,6 +252,31 @@ curl -X POST http://localhost:8000/v1/videos/generations \
   -F "files=@/path/to/audio.wav"
 ```
 
+**Seedance 2.0 Fast VIP 极速推理示例（会员专属通道）：**
+
+```bash
+curl -X POST http://localhost:8000/v1/videos/generations \
+  -H "Authorization: Bearer your_sessionid" \
+  -F "model=jimeng-video-seedance-2.0-fast-vip" \
+  -F "prompt=@1 图片中的人物开始微笑" \
+  -F "ratio=4:3" \
+  -F "duration=4" \
+  -F "files=@/path/to/image.jpg"
+```
+
+**Seedance 2.0 VIP 主模态能力示例（会员专属通道）：**
+
+```bash
+curl -X POST http://localhost:8000/v1/videos/generations \
+  -H "Authorization: Bearer your_sessionid" \
+  -F "model=jimeng-video-seedance-2.0-vip" \
+  -F "prompt=@1 和 @2 两人开始跳舞" \
+  -F "ratio=4:3" \
+  -F "duration=5" \
+  -F "files=@/path/to/image1.jpg" \
+  -F "files=@/path/to/image2.jpg"
+```
+
 ## 项目结构
 
 ```
@@ -322,6 +349,10 @@ jimeng-free-api-all/
 | `seedance-2.0-pro` | `dreamina_seedance_40_pro` | Seedance 2.0（向后兼容别名） |
 | `jimeng-video-seedance-2.0-fast` | `dreamina_seedance_40` | Seedance 2.0-fast 快速版（上游标准名称） |
 | `seedance-2.0-fast` | `dreamina_seedance_40` | Seedance 2.0-fast 快速版（向后兼容别名） |
+| `jimeng-video-seedance-2.0-fast-vip` | `dreamina_seedance_40_vision` | Seedance 2.0 Fast VIP Vision 极速推理版（会员专属通道） |
+| `seedance-2.0-fast-vip` | `dreamina_seedance_40_vision` | Seedance 2.0 Fast VIP Vision（向后兼容别名） |
+| `jimeng-video-seedance-2.0-vip` | `dreamina_seedance_40_pro_vision` | Seedance 2.0 VIP Vision 主模态能力版（会员专属通道） |
+| `seedance-2.0-vip` | `dreamina_seedance_40_pro_vision` | Seedance 2.0 VIP Vision（向后兼容别名） |
 
 ### 分辨率支持
 
@@ -506,13 +537,13 @@ curl http://localhost:8000/v1/videos/generations/async/4f2acc30-2b57-11f1-9361-e
 > - 程序启动时自动恢复未完成的 processing 任务并重新执行轮询
 > - 已完成任务 **24 小时**后自动过期清理
 
-### Seedance 2.0 / 2.0-fast 接口
+### Seedance 2.0 / 2.0-fast / VIP 接口
 
 **POST /v1/videos/generations**
 
 | 参数 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
-| model | string | 是 | - | jimeng-video-seedance-2.0（推荐）、jimeng-video-seedance-2.0-fast（快速版）或 seedance-2.0 |
+| model | string | 是 | - | jimeng-video-seedance-2.0（推荐）、jimeng-video-seedance-2.0-fast（快速版）、jimeng-video-seedance-2.0-fast-vip（VIP 极速推理）、jimeng-video-seedance-2.0-vip（VIP 主模态）或 seedance-2.0 |
 | prompt | string | 否 | - | 提示词，使用 @1、@2 引用素材（图片/视频/音频） |
 | ratio | string | 否 | 4:3 | 宽高比 |
 | duration | number | 否 | 4 | 视频时长 4-15 秒 |
@@ -538,7 +569,7 @@ curl http://localhost:8000/v1/videos/generations/async/4f2acc30-2b57-11f1-9361-e
 
 | 参数 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
-| model | string | 是 | - | seedance-2.0-fast 或 seedance-2.0-pro |
+| model | string | 是 | - | seedance-2.0-fast、seedance-2.0-pro、seedance-2.0-fast-vip 或 seedance-2.0-vip |
 | prompt | string | 否 | - | 提示词，使用 @1 引用素材 |
 | ratio | string | 否 | 4:3 | 宽高比：4:3, 16:9, 9:16 等 |
 | resolution | string | 否 | 720p | 分辨率 |
@@ -569,6 +600,15 @@ curl -X POST http://localhost:8000/v1/videos/international/generations \
     "duration": 4,
     "file_paths": ["https://example.com/image.jpg"]
   }'
+
+# 国际版 VIP 模型生成
+curl -X POST http://localhost:8000/v1/videos/international/generations \
+  -H "Authorization: Bearer sg-your_sessionid" \
+  -F "model=seedance-2.0-fast-vip" \
+  -F "prompt=@1 中的人物开始微笑" \
+  -F "ratio=4:3" \
+  -F "duration=4" \
+  -F "image_file=@/path/to/image.jpg"
 ```
 
 #### 异步生成（v0.8.9 新增）
@@ -838,6 +878,15 @@ Authorization: Bearer sessionid1,sessionid2,sessionid3
 </details>
 
 ## 更新日志
+
+### v0.8.10 (2026-04-03) - 新增 Seedance 2.0 VIP Vision 会员专属模型 + 上传区域路由分离
+
+- ✨ **新增 Seedance 2.0 Fast VIP Vision 模型**：极速推理版（`jimeng-video-seedance-2.0-fast-vip` / `seedance-2.0-fast-vip`），内部模型 `dreamina_seedance_40_vision`，VIP 会员专属通道，Draft 版本 3.3.12
+- ✨ **新增 Seedance 2.0 VIP Vision 模型**：主模态能力版（`jimeng-video-seedance-2.0-vip` / `seedance-2.0-vip`），内部模型 `dreamina_seedance_40_pro_vision`，VIP 会员专属通道，Draft 版本 3.3.12
+- ✨ **VIP 模型同步支持国内版和国际版**：国内 `/v1/videos/generations` 和国际版 `/v1/videos/international/generations` 均支持 4 个 VIP 模型
+- 🔧 **上传区域路由分离**：新增 `regionFetch()` / `cnFetch()` 函数，国内版上传直连（不走代理），国际版上传走代理，避免 CN 上传目标（`imagex.bytedanceapi.com`）因代理导致连接失败
+- 🔧 **生成请求参数增强**：新增 `commerce_with_input_video: "1"` 和 `workspace_id: 0` 参数，匹配即梦官网最新请求格式
+- 📝 **/v1/models 接口更新**：新增 4 个 VIP 模型到模型列表接口
 
 ### v0.8.9 (2026-04-01) - 国际版 Seedance + 纯算法签名绕过 shark + 异步接口
 

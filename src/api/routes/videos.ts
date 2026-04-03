@@ -73,9 +73,7 @@ export default {
 
             // 根据模型类型选择不同的生成函数
             let videoUrl: string;
-            if (isInternationalSeedanceModel(model)) {
-                throw new Error('国际版 Seedance 请使用 /v1/videos/international/generations');
-            } else if (isSeedanceModel(model)) {
+            if (isSeedanceModel(model)) {
                 // Seedance 2.0 多图智能视频生成
                 // Seedance 默认时长为 4 秒，默认比例为 4:3
                 const seedanceDuration = finalDuration === 5 ? 4 : finalDuration; // 如果是默认的5秒，转为4秒
@@ -136,7 +134,7 @@ export default {
         '/international/generations': async (request: Request) => {
             const contentType = request.headers['content-type'] || '';
             const isMultiPart = contentType.startsWith('multipart/form-data');
-            const allowedModels = ['seedance-2.0-fast', 'seedance-2.0-pro', 'jimeng-video-seedance-2.0-fast', 'jimeng-video-seedance-2.0'];
+            const allowedModels = ['seedance-2.0-fast', 'seedance-2.0-pro', 'jimeng-video-seedance-2.0-fast', 'jimeng-video-seedance-2.0', 'jimeng-video-seedance-2.0-fast-vip', 'seedance-2.0-fast-vip', 'jimeng-video-seedance-2.0-vip', 'seedance-2.0-vip'];
             const hasKeyedUrlFields = Object.keys(request.body || {}).some(key => (
                 key === 'image_file' || key === 'video_file' || key.startsWith('image_file_') || key.startsWith('video_file_')
             ) && _.isString(request.body[key]));
@@ -210,7 +208,7 @@ export default {
         '/international/generations/async': async (request: Request) => {
             const contentType = request.headers['content-type'] || '';
             const isMultiPart = contentType.startsWith('multipart/form-data');
-            const allowedModels = ['seedance-2.0-fast', 'seedance-2.0-pro', 'jimeng-video-seedance-2.0-fast', 'jimeng-video-seedance-2.0'];
+            const allowedModels = ['seedance-2.0-fast', 'seedance-2.0-pro', 'jimeng-video-seedance-2.0-fast', 'jimeng-video-seedance-2.0', 'jimeng-video-seedance-2.0-fast-vip', 'seedance-2.0-fast-vip', 'jimeng-video-seedance-2.0-vip', 'seedance-2.0-vip'];
             const hasKeyedUrlFields = Object.keys(request.body || {}).some(key => (
                 key === 'image_file' || key === 'video_file' || key.startsWith('image_file_') || key.startsWith('video_file_')
             ) && _.isString(request.body[key]));

@@ -144,6 +144,30 @@ export default {
                         "object": "model",
                         "owned_by": "jimeng-free-api",
                         "description": "Seedance 2.0-fast 快速多图智能视频生成模型（jimeng-video-seedance-2.0-fast 的别名，向后兼容）"
+                    },
+                    {
+                        "id": "jimeng-video-seedance-2.0-fast-vip",
+                        "object": "model",
+                        "owned_by": "jimeng-free-api",
+                        "description": "Seedance 2.0 Fast VIP Vision 文生视频模型（dreamina_seedance_40_vision，VIP 快速版，支持文生视频和图生视频）"
+                    },
+                    {
+                        "id": "seedance-2.0-fast-vip",
+                        "object": "model",
+                        "owned_by": "jimeng-free-api",
+                        "description": "Seedance 2.0 Fast VIP Vision 文生视频模型（jimeng-video-seedance-2.0-fast-vip 的别名，向后兼容）"
+                    },
+                    {
+                        "id": "jimeng-video-seedance-2.0-vip",
+                        "object": "model",
+                        "owned_by": "jimeng-free-api",
+                        "description": "Seedance 2.0 VIP Vision 主模态能力视频模型（dreamina_seedance_40_pro_vision，VIP 专业版，主模态能力）"
+                    },
+                    {
+                        "id": "seedance-2.0-vip",
+                        "object": "model",
+                        "owned_by": "jimeng-free-api",
+                        "description": "Seedance 2.0 VIP Vision 主模态能力视频模型（jimeng-video-seedance-2.0-vip 的别名，向后兼容）"
                     }
                 ]
             };

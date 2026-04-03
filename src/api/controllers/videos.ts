@@ -28,6 +28,12 @@ const MODEL_DRAFT_VERSIONS: { [key: string]: string } = {
   // Seedance 2.0-fast 模型（v1.9.3 新增）
   "jimeng-video-seedance-2.0-fast": "3.3.9",
   "seedance-2.0-fast": "3.3.9",
+  // Seedance 2.0 Fast VIP Vision 模型（文生视频，model_req_key=dreamina_seedance_40_vision）
+  "jimeng-video-seedance-2.0-fast-vip": "3.3.12",
+  "seedance-2.0-fast-vip": "3.3.12",
+  // Seedance 2.0 VIP Vision 模型（主模态能力，model_req_key=dreamina_seedance_40_pro_vision）
+  "jimeng-video-seedance-2.0-vip": "3.3.12",
+  "seedance-2.0-vip": "3.3.12",
 };
 
 const MODEL_MAP = {
@@ -43,6 +49,12 @@ const MODEL_MAP = {
   // Seedance 2.0-fast 快速生成模型（v1.9.3 新增，内部模型为 dreamina_seedance_40）
   "jimeng-video-seedance-2.0-fast": "dreamina_seedance_40",
   "seedance-2.0-fast": "dreamina_seedance_40",
+  // Seedance 2.0 Fast VIP Vision 文生视频模型（内部模型为 dreamina_seedance_40_vision）
+  "jimeng-video-seedance-2.0-fast-vip": "dreamina_seedance_40_vision",
+  "seedance-2.0-fast-vip": "dreamina_seedance_40_vision",
+  // Seedance 2.0 VIP Vision 文生视频模型（内部模型为 dreamina_seedance_40_pro_vision）
+  "jimeng-video-seedance-2.0-vip": "dreamina_seedance_40_pro_vision",
+  "seedance-2.0-vip": "dreamina_seedance_40_pro_vision",
 };
 
 // Seedance 模型的 benefit_type 映射
@@ -53,6 +65,12 @@ const SEEDANCE_BENEFIT_TYPE_MAP: { [key: string]: string } = {
   // Seedance 2.0-fast（v1.9.3 新增，注意：无 "video_" 前缀）
   "jimeng-video-seedance-2.0-fast": "dreamina_seedance_20_fast",
   "seedance-2.0-fast": "dreamina_seedance_20_fast",
+  // Seedance 2.0 Fast VIP Vision（benefit_type 与国际版一致：seedance_20_fast_720p_output）
+  "jimeng-video-seedance-2.0-fast-vip": "seedance_20_fast_720p_output",
+  "seedance-2.0-fast-vip": "seedance_20_fast_720p_output",
+  // Seedance 2.0 VIP Vision（主模态能力，benefit_type：seedance_20_pro_720p_output）
+  "jimeng-video-seedance-2.0-vip": "seedance_20_pro_720p_output",
+  "seedance-2.0-vip": "seedance_20_pro_720p_output",
 };
 
 const INTERNATIONAL_SEEDANCE_MODEL_MAP: Record<string, string> = {
@@ -60,6 +78,10 @@ const INTERNATIONAL_SEEDANCE_MODEL_MAP: Record<string, string> = {
   "seedance-2.0-pro": "dreamina_seedance_40_pro",
   "jimeng-video-seedance-2.0-fast": "dreamina_seedance_40",
   "seedance-2.0-fast": "dreamina_seedance_40",
+  "jimeng-video-seedance-2.0-fast-vip": "dreamina_seedance_40_vision",
+  "seedance-2.0-fast-vip": "dreamina_seedance_40_vision",
+  "jimeng-video-seedance-2.0-vip": "dreamina_seedance_40_pro_vision",
+  "seedance-2.0-vip": "dreamina_seedance_40_pro_vision",
 };
 
 const INTERNATIONAL_SEEDANCE_BENEFIT_TYPE_MAP: Record<string, string> = {
@@ -67,6 +89,10 @@ const INTERNATIONAL_SEEDANCE_BENEFIT_TYPE_MAP: Record<string, string> = {
   "seedance-2.0-pro": "seedance_20_pro_720p_output",
   "jimeng-video-seedance-2.0-fast": "seedance_20_fast_720p_output",
   "seedance-2.0-fast": "seedance_20_fast_720p_output",
+  "jimeng-video-seedance-2.0-fast-vip": "seedance_20_fast_720p_output",
+  "seedance-2.0-fast-vip": "seedance_20_fast_720p_output",
+  "jimeng-video-seedance-2.0-vip": "seedance_20_pro_720p_output",
+  "seedance-2.0-vip": "seedance_20_pro_720p_output",
 };
 
 // 判断是否为 Seedance 模型
@@ -287,6 +313,21 @@ async function proxyFetch(url: string | Request, init?: RequestInit): Promise<Re
   return fetch(url as string, init);
 }
 
+/**
+ * 国内专用 fetch（不走代理）
+ * CN 上传目标（imagex.bytedanceapi.com）不需要代理，走代理反而会失败
+ */
+async function cnFetch(url: string | Request, init?: RequestInit): Promise<Response> {
+  return fetch(url as string, init);
+}
+
+/**
+ * 区域感知 fetch：国际上传走代理，国内直连
+ */
+function regionFetch(regionInfo: import("./core.ts").RegionInfo | undefined): (url: string | Request, init?: RequestInit) => Promise<Response> {
+  return regionInfo?.isInternational ? proxyFetch : cnFetch;
+}
+
 // AWS4-HMAC-SHA256 签名生成函数（从 images.ts 复制）
 function createSignature(
   method: string,
@@ -405,6 +446,7 @@ async function uploadImageForVideo(imageUrl: string, refreshToken: string, regio
     logger.info(`开始上传视频图片: ${imageUrl}`);
 
     const ri = regionInfo || parseRegionFromToken(refreshToken);
+    const rf = regionFetch(ri);
     const awsRegion = getUploadAWSRegion(ri);
     const imageXHost = getImageXHost(ri);
     const uploadOrigin = getUploadOrigin(ri);
@@ -416,31 +458,31 @@ async function uploadImageForVideo(imageUrl: string, refreshToken: string, regio
         scene: 2, // AIGC 图片上传场景
       },
     });
-    
+
     const { access_key_id, secret_access_key, session_token, service_id, space_name } = tokenResult;
     if (!access_key_id || !secret_access_key || !session_token) {
       throw new Error("获取上传令牌失败");
     }
-    
+
     const actualServiceId = resolveServiceId(tokenResult, ri);
     logger.info(`获取上传令牌成功: service_id=${actualServiceId}`);
-    
+
     // 下载图片数据
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`下载图片失败: ${imageResponse.status}`);
     }
-    
+
     const imageBuffer = await imageResponse.arrayBuffer();
     const fileSize = imageBuffer.byteLength;
     const crc32 = calculateCRC32(imageBuffer);
-    
+
     logger.info(`图片下载完成: 大小=${fileSize}字节, CRC32=${crc32}`);
-    
+
     // 第二步：申请图片上传权限
     const now = new Date();
     const timestamp = now.toISOString().replace(/[:\-]/g, '').replace(/\.\d{3}Z$/, 'Z');
-    
+
     const randomStr = Math.random().toString(36).substring(2, 12);
     const applyUrl = `${imageXHost}/?Action=ApplyImageUpload&Version=2018-08-01&ServiceId=${actualServiceId}&FileSize=${fileSize}&s=${randomStr}${ri.isInternational ? '&device_platform=web' : ''}`;
 
@@ -453,7 +495,7 @@ async function uploadImageForVideo(imageUrl: string, refreshToken: string, regio
 
     logger.info(`申请上传权限: ${applyUrl}`);
 
-    const applyResponse = await proxyFetch(applyUrl, {
+    const applyResponse = await rf(applyUrl, {
       method: 'GET',
       headers: {
         'accept': '*/*',
@@ -502,7 +544,7 @@ async function uploadImageForVideo(imageUrl: string, refreshToken: string, regio
     logger.info(`准备上传图片: imageId=${imageId}, uploadUrl=${uploadUrl}`);
 
     // 第三步：上传图片文件
-    const uploadResponse = await proxyFetch(uploadUrl, {
+    const uploadResponse = await rf(uploadUrl, {
       method: 'POST',
       headers: {
         'Accept': '*/*',
@@ -549,7 +591,7 @@ async function uploadImageForVideo(imageUrl: string, refreshToken: string, regio
 
     const commitAuthorization = createSignature('POST', commitUrl, commitRequestHeaders, access_key_id, secret_access_key, session_token, commitPayload, awsRegion, 'imagex');
 
-    const commitResponse = await proxyFetch(commitUrl, {
+    const commitResponse = await rf(commitUrl, {
       method: 'POST',
       headers: {
         'accept': '*/*',
@@ -616,6 +658,7 @@ async function uploadImageBufferForVideo(buffer: Buffer, refreshToken: string, r
     logger.info(`开始从Buffer上传视频图片，大小: ${buffer.length}字节`);
 
     const ri = regionInfo || parseRegionFromToken(refreshToken);
+    const rf = regionFetch(ri);
     const awsRegion = getUploadAWSRegion(ri);
     const imageXHost = getImageXHost(ri);
     const uploadOrigin = getUploadOrigin(ri);
@@ -655,7 +698,7 @@ async function uploadImageBufferForVideo(buffer: Buffer, refreshToken: string, r
 
     const authorization = createSignature('GET', applyUrl, requestHeaders, access_key_id, secret_access_key, session_token, '', awsRegion, 'imagex');
 
-    const applyResponse = await proxyFetch(applyUrl, {
+    const applyResponse = await rf(applyUrl, {
       method: 'GET',
       headers: {
         'accept': '*/*',
@@ -692,7 +735,7 @@ async function uploadImageBufferForVideo(buffer: Buffer, refreshToken: string, r
     const uploadUrl = `https://${uploadHost}/upload/v1/${storeInfo.StoreUri}`;
 
     // 第三步：上传图片文件
-    const uploadResponse = await proxyFetch(uploadUrl, {
+    const uploadResponse = await rf(uploadUrl, {
       method: 'POST',
       headers: {
         'Accept': '*/*',
@@ -733,7 +776,7 @@ async function uploadImageBufferForVideo(buffer: Buffer, refreshToken: string, r
 
     const commitAuthorization = createSignature('POST', commitUrl, commitRequestHeaders, access_key_id, secret_access_key, session_token, commitPayload, awsRegion, 'imagex');
 
-    const commitResponse = await proxyFetch(commitUrl, {
+    const commitResponse = await rf(commitUrl, {
       method: 'POST',
       headers: {
         'accept': '*/*',
@@ -842,6 +885,7 @@ async function uploadMediaForVideo(
   logger.info(`开始上传${label}文件，大小: ${fileSize} 字节`);
 
   const ri = regionInfo || parseRegionFromToken(refreshToken);
+  const rf = regionFetch(ri);
   const awsRegion = getUploadAWSRegion(ri);
   const uploadOrigin = getUploadOrigin(ri);
   const uploadReferer = getUploadReferer(ri);
@@ -880,7 +924,7 @@ async function uploadMediaForVideo(
 
   logger.info(`申请${label}上传权限: ${applyUrl}`);
 
-  const applyResponse = await proxyFetch(applyUrl, {
+  const applyResponse = await rf(applyUrl, {
     method: 'GET',
     headers: {
       'accept': '*/*',
@@ -929,7 +973,7 @@ async function uploadMediaForVideo(
 
   logger.info(`开始上传${label}文件: ${uploadUrl}, CRC32=${crc32}`);
 
-  const uploadResponse = await proxyFetch(uploadUrl, {
+  const uploadResponse = await rf(uploadUrl, {
     method: 'POST',
     headers: {
       'Accept': '*/*',
@@ -979,7 +1023,7 @@ async function uploadMediaForVideo(
 
   logger.info(`提交${label}上传确认: ${commitUrl}`);
 
-  const commitResponse = await proxyFetch(commitUrl, {
+  const commitResponse = await rf(commitUrl, {
     method: 'POST',
     headers: {
       'accept': '*/*',
@@ -1843,6 +1887,7 @@ export async function generateSeedanceVideo(
     webId: String(WEB_ID),
     da_version: draftVersion,
     web_component_open_flag: "1",
+    commerce_with_input_video: "1",
     web_version: "7.5.0",
     aigc_features: "app_lip_sync",
   });
@@ -1850,6 +1895,7 @@ export async function generateSeedanceVideo(
   const generateBody = {
     extend: {
       root_model: model,
+      workspace_id: 0,
       m_video_commerce_info: {
         benefit_type: finalBenefitType,
         resource_id: "generate_video",
@@ -3484,12 +3530,14 @@ async function _generateSeedanceVideoWithHistoryId(
   const generateQueryParams = new URLSearchParams({
     aid: String(CORE_ASSISTANT_ID), device_platform: "web", region: "cn",
     webId: String(WEB_ID), da_version: draftVersion, web_component_open_flag: "1",
+    commerce_with_input_video: "1",
     web_version: "7.5.0", aigc_features: "app_lip_sync",
   });
   const generateUrl = `https://jimeng.jianying.com/mweb/v1/aigc_draft/generate?${generateQueryParams.toString()}`;
   const generateBody = {
     extend: {
       root_model: model,
+      workspace_id: 0,
       m_video_commerce_info: { benefit_type: finalBenefitType, resource_id: "generate_video", resource_id_type: "str", resource_sub_type: "aigc" },
       m_video_commerce_info_list: [{ benefit_type: finalBenefitType, resource_id: "generate_video", resource_id_type: "str", resource_sub_type: "aigc" }]
     },
